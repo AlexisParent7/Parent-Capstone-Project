@@ -1,0 +1,118 @@
+---
+title: "Parent_Capstone_Project"
+author: Alexis Parent 
+date: 11/1/2024
+format: html
+editor: visual
+---
+
+```{r}
+# clear R's brain and set up R 
+rm(list=ls())
+library(tidyverse)
+library(multcomp)
+library(dplyr)
+library(ggfortify)
+library(here)
+```
+
+```{r}
+# read in csv file for both datasets
+organic_matter_soil <- read.csv(here("Data", "fig_S9.csv"))
+
+total_N <- read.csv(here("Data", "fig_S17.csv"))
+```
+
+```{r}
+# take a look at the data 
+glimpse(total_N)
+levels(total_N)
+
+glimpse(organic_matter_soil)
+levels(organic_matter_soil)
+```
+
+From the total_N data, we can see there are 35 rows and 23 columns. Most of which I will not be utilizing except, SOC and total_N. Both of which are numerical.
+
+From the organic_matter_soil data, we can see there are 24 rows and 5 columns. I will be utilizing the columns rotation, POM and MAOM.
+
+```{r}
+# isolate columns needed for data analysis for total_N dataset
+SOC_total_N <- total_N |> dplyr::select(SOC, total_N)
+
+print(SOC_total_N)
+view(SOC_total_N)
+
+# isolate columns for organic_matter dataset
+organic_matter <- organic_matter_soil |> dplyr::select(rotation, POM, MAOM)
+view(organic_matter)
+```
+
+```{r}
+# identify outliers for SOC_total_N 
+ggplot(SOC_total_N, aes(x = SOC, y = total_N)) +
+  geom_point(color = "blue", size = 2)
+
+# identify outliers using for organic matter 
+ggplot(organic_matter, aes(MAOM)) + 
+    geom_histogram() 
+
+ggplot(organic_matter, aes(POM)) + 
+    geom_histogram() 
+ 
+```
+
+Interpretation:
+
+In SOC_total_N there seems to be one outlier in the top right hand corner with a high SOC and a high total_N concentration. However, I am going to leave this outlier in the data because it can be indicative that as SOC increases total N will also continue to increase beyond where the other points are clustered in the graph. The outlier could also be indicitive of a unique observation about how high total nitrogen is compared to the amount of SOC.
+
+Furthermore, we can also see there is a positive linear relationship from as the points are lower when SOC and total N are low, and then nitrogen increases as SOC increases.
+
+In the organic_matter data set, there don't seem to be outliers in either the MAOM and POM. For POM the bars are more equally distributed between 0 and 0.25 with a few bars on either side. As a result, it seems like MAOM has a more drastic difference in years 2-4 than POM because the bars mostly reside on the left side of the bar graph, with only a few on the right.
+
+```{r}
+# cleaned data 
+# define file path
+data_folder_path <- "Users/alexisparent/Desktop/BIOSTAT/Parent-Capstone-Project/Data"
+
+# cleaned files
+organic_matter_clean.csv <- "organic_matter"
+SOC_total_N_clean.csv <- "SOC_total_N"
+
+#combine file path and names of csv files
+file_path <- file.path(data_folder_path, "organic_matter_clean.csv", "SOC_total_N_clean.csv")
+
+# save cleaned dataset as csv files
+write.csv(organic_matter, file = "organic_matter_clean.csv", row.names = FALSE)
+write.csv(SOC_total_N, file = "SOC_total_N_clean.csv", row.names = FALSE)
+
+```
+
+Now that the data is cleaned and saved into the data folder, we can now perform an exploratory data analysis. The code below begins the exploratory analysis.
+
+```{r}
+# exploratory analysis 
+# mean and sd for organic_matter_soil for POM
+organic_matter_soil |> group_by(rotation) |> summarise(
+  mean_POM = mean(POM, na.rm = T),
+  sd_POM= sd(POM, na.rm = T))
+
+ # mean and sd for MAOM
+organic_matter_soil |> group_by(rotation) |> summarise(
+  mean_MAOM = mean(MAOM, na.rm = T),
+  sd_MAOM= sd(MAOM, na.rm = T))
+```
+
+Organic matter soil: From the mean of POM, we can see that as years (rotation) go on the mean POM increases. Furthermore, as the rotation increases in years for MAOM, the mean MAOM also increases greatly from year 2 to 3 and then decreases from year 3 to 4. As a result, it looks like there could be a significant relationship between number of years rotated and the amount of POM/MAOM in the soil.
+
+```{r}
+# exploratory analysis 
+# mean and sd for total_N
+SOC_total_N |> group_by(SOC) |> summarise(
+  mean_total_N = mean(total_N, na.rm = T),
+  sd_total_N= sd(total_N, na.rm = T))
+```
+
+SOC_total_N: As SOC continues to increase, the mean total nitrogen concentration also continues to increase. Until the end where it hits 2 and then decreases just slightly as SOC goes up.
+
+As a result from the graphs above and looking at the relationships within both sets of data. I believe a regression model would be the most appropriate because I am looking at the relationship between one or more independent variables (ex. rotation, SOC) and the dependent variable (ex. total_N, POM, MAOM).
