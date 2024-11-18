@@ -1,0 +1,19 @@
+---
+title: "data-exploration-feedback"
+format: html
+editor: visual
+---
+
+## Data Exploration Feedback
+
+1.  Please name your `.qmd` files according to what they do, e.g. "data-exploration.qmd" rather than "Parent_Capstone_Project.qmd" as each file will accomplish separate tasks (you will add one for each analysis).
+2.  Line 35 - total_N has 36, not 35 rows of data.
+3.  Please keep working on the difference between commenting the code itself and providing commentary outside of code chunks. For example, line 52 really is not about the code, which does not identify outliers but instead creates a scatterplot. Rather, identifying outliers is your overall objective. Thus, that should go as commentary outside of code chunks. I want to be able to read all of the narrative outside of code chunks and understand your entire train of thought.
+4.  There is nowhere in your code where you attempt to check the levels for your factor variables to make sure there are no mistakes.
+5.  Lines 53-54 are not a good way to identify outliers. We talked about using histograms and box plots to identify outliers, not using scatter plots. I'm unclear why you made histograms for the organic matter data but not for soil nitrogen.
+6.  In your interpretation in lines 67 - 71 (which I appreciate!), I am confused about how you are drawing a conclusion that MAOM might have a more drastic difference in years 2-4 when nothing about year is included in the figures. Also, your histograms for POM and MAOM show negative values. How is that possible and is there something you should do iwth them (make them 0, perhaps? - I think you need to look into what a negative value means).
+7.  You have some confusing code on lines 79-80 that is unnedessary, and the same for the file path information on the next lines. We have been working all semester to understand how to use the `here()` function because it means you don't need any of this file path stuff. While I am not adverse, in general, to the fact that there are many ways to do things in R, the method you have chosen suggests that you haven't mastered the method we have been focusing on and also causes you to have more cluttered code with unnecessary steps. Please see if you can figure out the `here()` package before the next submission (I can help!).
+8.  Lines 96 - 103: Once again, how is it that one can get negative values for POM and MAOM?
+9.  Line 118 - I'm confused here. YOu will always be looking at the relationship b/w an independent variable (or variables) and a dependent variable, but that is not what determines if regression is the appropriate analysis. You will need to use our statistical method flow diagram to determine the correct analysis method.
+
+Overall though, you are getting the idea and I see some nice improvement!
