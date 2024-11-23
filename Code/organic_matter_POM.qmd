@@ -1,0 +1,98 @@
+---
+title: "organic_matter.qmd"
+name: Alexis Parent 
+Date: 11/16/2024
+format: html
+editor: visual
+---
+
+I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of POM. 
+
+```{r}
+# set up R and clear R's brain
+rm(list=ls())
+library(tidyverse)
+library(multcomp)
+library(dplyr)
+library(ggfortify)
+library(here)
+```
+
+```{r}
+# read in cleaned data file 
+organic_matter_POM <- read_csv(here("Parent-Capstone-Project","Data","organic_matter_clean.csv"))
+```
+
+```{r}
+# take a look at the data 
+glimpse(organic_matter_POM)
+levels(organic_matter_POM)
+view(organic_matter_POM)
+```
+
+From looking at the cleaned data, we can now see we only have 24 rows and 3 columns. The columns are now rotation, POM, and MAOM. The data also looks clean. There are no NA's, odd numbers, or missing variables. However, there are some negative values that I am not sure if I should leave or get rid of. 
+
+From checking the levels, we can see rotation has 2,3 and 4. 
+
+```{r}
+# plot the relationships 
+ggplot(organic_matter_POM, aes(x = rotation, y = POM)) +
+  geom_bar(stat = "identity", fill = "skyblue") 
+
+ggplot(organic_matter_POM, aes(x = POM)) + 
+  geom_histogram() + 
+  facet_wrap(~ rotation, ncol = 1)
+```
+
+From the plot we can see as rotation increases in years, the range of POM in the soil becomes greater. However, as the rotation is lower (2 years) the amount of POM is more concentrated around 0.
+
+Next we are going to make the model: 
+
+```{r}
+# make the model
+organic_matter_POM_mod <- lm(POM ~ rotation, data = organic_matter_POM)
+```
+
+```{r}
+# check model assumptions
+autoplot(organic_matter_POM_mod, smooth.colour = NA)
+```
+
+From the model we can see the the observations relatively follow the qualities of a normal distribution.
+
+```{r}
+# find the mean and sd of POM 
+organic_matter_POM |> group_by(rotation) |> summarise(
+  mean_POM = mean(POM, na.rm = T),
+  sd_POM = sd(POM, na.rm = T))
+```
+
+As rotation increases in number of years, the mean POM also increases. For the standard deviation, as the rotation increases, standard deviation is the highest at year 3 and then starts decreasing at year 4. 
+
+Next we are going to use summary() to conduct a regression test. 
+
+```{r}
+# conduct an regression test for POM
+summary(organic_matter_POM_mod)
+```
+
+Interpretation: 
+
+A linear regression was conducted to look at the relationship between rotation in years and particulate organic matter (POM). It can be seen that there is no relationship between rotation in years and POM (p > 0.05, f = 3.324, df = 22). 
+
+Next we are going to make a clean figure: 
+```{r}
+# making a clean figure 
+
+ggplot(organic_matter_POM, aes(x = factor(rotation), y = POM)) + 
+  geom_col(color = "darkgreen", fill = "darkgreen", width = 0.7) +
+  labs(
+    title = "Relationship Between Rotation and POM Concentration",
+    x = "Rotation (years)",
+    y = "POM"
+  ) +
+  theme_minimal()
+```
+
+Notes for Erika: 
+- I am confused if I should get rid of the negative values or not. I think I should, however, would that not make the data set too small? 
