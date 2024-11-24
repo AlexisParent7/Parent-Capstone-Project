@@ -5,6 +5,7 @@ date: 11/1/2024
 format: html
 editor: visual
 ---
+In this qmd file I will be exploring and cleaning data in the csv files "fig_S9.csv" and "fig_17.csv". 
 
 ```{r}
 # clear R's brain and set up R 
@@ -18,10 +19,12 @@ library(here)
 
 ```{r}
 # read in csv file for both datasets
-organic_matter_soil <- read.csv(here("Data", "fig_S9.csv"))
+organic_matter_soil <- read.csv(here("Parent-Capstone-Project", "Data", "fig_S9.csv"))
 
-total_N <- read.csv(here("Data", "fig_S17.csv"))
+total_N <- read.csv(here("Parent-Capstone-Project", "Data", "fig_S17.csv"))
 ```
+
+Next we are point to take a look at the data: 
 
 ```{r}
 # take a look at the data 
@@ -32,13 +35,13 @@ glimpse(organic_matter_soil)
 levels(organic_matter_soil)
 ```
 
-From the total_N data, we can see there are 35 rows and 23 columns. Most of which I will not be utilizing except, SOC and total_N. Both of which are numerical.
+From the total_N data, we can see there are 36 rows and 23 columns. Most of which I will not be utilizing except, SOC and total_N. Both of which are numerical. 
 
 From the organic_matter_soil data, we can see there are 24 rows and 5 columns. I will be utilizing the columns rotation, POM and MAOM.
 
 ```{r}
 # isolate columns needed for data analysis for total_N dataset
-SOC_total_N <- total_N |> dplyr::select(SOC, total_N)
+SOC_total_N <- total_N |> dplyr::select(SOC,total_N)
 
 print(SOC_total_N)
 view(SOC_total_N)
@@ -48,10 +51,22 @@ organic_matter <- organic_matter_soil |> dplyr::select(rotation, POM, MAOM)
 view(organic_matter)
 ```
 
+Now that the data is isolated into the columns I will be looking at, I can now check the levels of the variables to make sure there are no mistakes. 
+
+```{r}
+# check levels for SOC_total_N 
+levels(SOC)
+# check levels for organic_matter
+levels(organic_matter)
+```
+After checking the levels we can see there are 
+
+The code below is going to identify outliers for both datasets
+
 ```{r}
 # identify outliers for SOC_total_N 
-ggplot(SOC_total_N, aes(x = SOC, y = total_N)) +
-  geom_point(color = "blue", size = 2)
+ggplot(SOC_total_N, aes(SOC)) + 
+  geom_histogram()
 
 # identify outliers using for organic matter 
 ggplot(organic_matter, aes(MAOM)) + 
@@ -64,11 +79,13 @@ ggplot(organic_matter, aes(POM)) +
 
 Interpretation:
 
-In SOC_total_N there seems to be one outlier in the top right hand corner with a high SOC and a high total_N concentration. However, I am going to leave this outlier in the data because it can be indicative that as SOC increases total N will also continue to increase beyond where the other points are clustered in the graph. The outlier could also be indicitive of a unique observation about how high total nitrogen is compared to the amount of SOC.
+In SOC_total_N there seems to be one outlier on the right hand side with a high SOC and a high total_N concentration. However, I am going to leave this outlier in the data because it can be indicative that as SOC increases total N will also continue to increase beyond where the other points are clustered in the graph. The outlier could also be indicitive of a unique observation about how high total nitrogen is compared to the amount of SOC.
 
-Furthermore, we can also see there is a positive linear relationship from as the points are lower when SOC and total N are low, and then nitrogen increases as SOC increases.
+In the organic_matter data set, there don't seem to be outliers in either the MAOM and POM. For POM, the bars are more equally distributed between 0 and 0.25 with a few bars on either side. Furthermore, for MAOM the bar plot is more left skewed with only a few values around 1.0 and most values around 0 or below. 
 
-In the organic_matter data set, there don't seem to be outliers in either the MAOM and POM. For POM the bars are more equally distributed between 0 and 0.25 with a few bars on either side. As a result, it seems like MAOM has a more drastic difference in years 2-4 than POM because the bars mostly reside on the left side of the bar graph, with only a few on the right.
+Furthermore, there are negative values for both and although I believe they are accurate, I do not think they are appropriate for the data set and should get rid of them (left a comment for you in teams to discuss!!)
+
+Next we are going to save the cleaned data sets: 
 
 ```{r}
 # cleaned data 
@@ -105,8 +122,9 @@ organic_matter_soil |> group_by(rotation) |> summarise(
 
 Organic matter soil: From the mean of POM, we can see that as years (rotation) go on the mean POM increases. Furthermore, as the rotation increases in years for MAOM, the mean MAOM also increases greatly from year 2 to 3 and then decreases from year 3 to 4. As a result, it looks like there could be a significant relationship between number of years rotated and the amount of POM/MAOM in the soil.
 
+Exploratory Analysis: 
+
 ```{r}
-# exploratory analysis 
 # mean and sd for total_N
 SOC_total_N |> group_by(SOC) |> summarise(
   mean_total_N = mean(total_N, na.rm = T),
@@ -115,4 +133,9 @@ SOC_total_N |> group_by(SOC) |> summarise(
 
 SOC_total_N: As SOC continues to increase, the mean total nitrogen concentration also continues to increase. Until the end where it hits 2 and then decreases just slightly as SOC goes up.
 
-As a result from the graphs above and looking at the relationships within both sets of data. I believe a regression model would be the most appropriate because I am looking at the relationship between one or more independent variables (ex. rotation, SOC) and the dependent variable (ex. total_N, POM, MAOM).
+As a result from the graphs above and looking at the relationships within both sets of data. I believe a regression model would be the most appropriate for SOC_total_N. The response variable is total_N in the soil, which is ratio data, with a continuous predictor variable (SOC). There is only one predictor variable (SOC), as a result, this leads me to a linear regression model. 
+
+For the organic_matter_soil data set we are looking at SOC and MAOM as a response variable for rotation (years). SOC and MAOM are both continuous response variables, and rotation (years) is a categorical varibale. Which I believe would be a regression test. 
+
+
+
