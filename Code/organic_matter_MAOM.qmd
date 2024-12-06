@@ -5,7 +5,8 @@ date: 11/17/2024
 format: html
 editor: visual
 ---
-I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of MAOM in the soil. 
+
+I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of MAOM in the soil. MAOM is an abbreviation for mineral aggregate organic matter.
 
 ```{r}
 # set up R and clear R's brain
@@ -21,7 +22,8 @@ library(here)
 # read in cleaned data file 
 organic_matter_MAOM <- read_csv(here("Parent-Capstone-Project", "Data", "organic_matter_clean.csv"))
 ```
-Next we are going to look at the data before we plot it. 
+
+Next we are going to look at the data before we plot it.
 
 ```{r}
 # take a look at the data 
@@ -30,9 +32,9 @@ levels(organic_matter_MAOM)
 view(organic_matter_MAOM)
 ```
 
-From the data we can see we are looking at three levels of the rotation (2,3, and 4 years). Furthermore, we are also looking at two other categories, POM and MAOM and how they correlate to the rotation in years. 
+From the data we can see we are looking at three levels of the rotation (2,3, and 4 years). Furthermore, we are also looking at two other categories, POM and MAOM and how they correlate to the rotation in years.
 
-Now that we have looked at the data a bit more, we are going to plot the relationships. 
+Now that we have looked at the data a bit more, we are going to plot the relationships.
 
 ```{r}
 # plot the relationships 
@@ -46,7 +48,7 @@ ggplot(organic_matter_MAOM, aes(x = MAOM)) +
 
 From the graph we can see there is a greater range of MAOM concentrations as the rotation in years increase. Specifically at rotation 2 the MAOM concentrations oscillate around 0. As the rotations in years increase, the MAOM concentration range becomes larger.
 
-Next we will look at the mean and standard deviation to look a bit more at the relationship between MAOM and organic matter. 
+Next we will look at the mean and standard deviation to look a bit more at the relationship between MAOM and organic matter.
 
 ```{r}
 # find the mean and sd 
@@ -59,28 +61,31 @@ As rotation increases, mean MAOM starts incredibly low, is the highest at year 3
 
 Compared to the relationship of rotations on POM, POM continued to increase as rotation increases while MAOM peaks at year 3 and then begins decreasing.
 
-Now we are going to make the model: 
+Now we are going to make the model:
 
 ```{r}
 # make the model 
-organic_matter_MAOM_mod <- lm(rotation ~ MAOM, data = organic_matter_MAOM)
+organic_matter_MAOM_mod <- lm(MAOM ~ rotation, data = organic_matter_MAOM)
 ```
 
 ```{r}
 # check the assumptions 
 autoplot(organic_matter_MAOM_mod, smooth.colour = NA)
 ```
-From checking the assumptions we can see there are some interesting things going on with the normal distribution. The observations are grouped together, which is expected for the year, so I am going to continue. Next we are going to conduct a regression test. 
+
+From checking the assumptions we can see there are some interesting things going on with the normal distribution. The observations are grouped together, which is expected for the year, so I am going to continue. 
 
 ```{r}
 # run a regression test using summary()
 summary(organic_matter_MAOM_mod)
 ```
-Interpretation: 
 
-A linear regression was conducted to see if there was an effect on rotation in years and mineral-associated organic matter (MAOM) in the soil. The coefficient for MAOM compared to rotation was 0.1289, which indicates a position correlation. However, there was no significant effect between rotation in years and MAOM concentration (p > 0.05, F = 0.1, df = 22). 
+Interpretation:
 
-Next we are going to make a clean figure: 
+A linear regression was conducted to see if there was an effect on rotation in years and mineral-associated organic matter (MAOM) in the soil. The coefficient for MAOM compared to rotation was 0.1289, which indicates a position correlation. However, there was no significant effect between rotation in years and MAOM concentration (p \> 0.05, F = 0.1, df = 22).
+
+Next we are going to make a clean figure:
+
 ```{r}
 # making a clean figure 
 ggplot(organic_matter_MAOM, aes(x = factor(rotation), y = MAOM)) + 
@@ -93,4 +98,4 @@ ggplot(organic_matter_MAOM, aes(x = factor(rotation), y = MAOM)) +
   theme_minimal()
 ```
 
-Erika, again on this regression model. I should get rid of the negative values. However, would that not make the data set too small? I am also confused because you told me to run each of these tests seperatly. However, they are all regression tests, and from my understanding we are supposed to run two different analysis'. 
+Erika, again on this regression model. I should get rid of the negative values. However, would that not make the data set too small? I am also confused because you told me to run each of these tests seperatly. However, they are all regression tests, and from my understanding we are supposed to run two different analysis'.
