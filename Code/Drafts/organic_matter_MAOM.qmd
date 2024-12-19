@@ -6,7 +6,11 @@ format: html
 editor: visual
 ---
 
+<<<<<<< HEAD
 I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of MAOM in the soil. MAOM is an abbreviation for mineral aggregate organic matter.
+=======
+I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of MAOM in the soil.
+>>>>>>> a459134229a8eb4d55e9a29528ff27a390b88d4d
 
 ```{r}
 # set up R and clear R's brain
@@ -73,7 +77,9 @@ organic_matter_MAOM_mod <- lm(MAOM ~ rotation, data = organic_matter_MAOM)
 autoplot(organic_matter_MAOM_mod, smooth.colour = NA)
 ```
 
-From checking the assumptions we can see there are some interesting things going on with the normal distribution. The observations are grouped together, which is expected for the year, so I am going to continue. 
+
+From checking the assumptions we can see there are some interesting things going on with the normal distribution. The observations are grouped together, which is expected for the year, so I am going to continue. Next we are going to conduct a regression test.
+
 
 ```{r}
 # run a regression test using summary()

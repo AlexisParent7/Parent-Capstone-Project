@@ -1,0 +1,111 @@
+---
+title: "total_N_SOC"
+author: Alexis Parent 
+date: 11/11/2024
+format: html
+editor: visual
+---
+In this analysis, I will be looking at the relationship between total Nitrogen in the soil and SOC in the soil using the data set 'SOC_total_N_clean.csv'. I will be conducting a linear regression. 
+
+The abbreviation SOC represents soil organic carbon, which is a     variable. 
+Total N represents the total nitrogen in the soil, which is a       variable. Soil organic carbon is the amount of carbon that is found with the organic matter of the soil, which is the decaying plants, manure, and organisms in the soil. Soil organic carbon is essential to soil health. It contributes to an increased nutrient availability, water holding capacity, and aids in soil structure, therefore increasing soil health and fertility. As organic matter decomposes into the soil, the microbes break down the carbon compounds and release nitrogen during decomposition. Therefore, a higher soil organic carbon means more nitrogen released into the soil. As a result of more nitrogen being readily available in the soil, it can reduce the net loss of nitrogen to the environment while aiding in increased crop yields. However, a excess amount of nitrogen can be detrimental to the environment and cause eutrophication in bodies of water (Palmer et.al 2017).
+
+Null Hypothesis: I believe there is no relationship between soil organic carbon and total nitrogen in the soil. 
+
+Alternative Hypothesis: I believe there will be a positive linear relationship between soil organic carbon and nitrogen in the soil. 
+
+```{r}
+# set up R and clear R's brain
+rm(list=ls())
+library(tidyverse)
+library(multcomp)
+library(dplyr)
+library(ggfortify)
+library(here)
+```
+
+```{r}
+# read in cleaned file 
+total_N_SOC <-  read_csv(here("Data", "SOC_total_N_clean.csv"))
+```
+Next we will take a look at the data
+
+```{r}
+# using glimpse() and view() to look at data 
+glimpse(total_N_SOC)
+view(total_N_SOC)
+```
+
+From the total_N data, we can see there are 36 rows and 2 columns (SOC and  total_N respectively). I used glimpse so I was able to quickly view what the data looked like. I then used view so I was able to open up another tab of the total data to see everything as a whole.
+
+```{r}
+# find the mean and sd of total N
+total_N_SOC|> summarise(
+  mean_total_N = mean(total_N, na.rm = T),
+  sd_total_N = sd(total_N, na.rm = T))
+
+# find the mean and sd of SOC 
+total_N_SOC |> summarise(
+  mean_SOC = mean(SOC, na.rm = T), 
+  sd_SOC = sd(SOC, na.rm = T))
+```
+
+The mean for total_N concentration is 1.749. The standard deviation for total_N concentration is 0.2394. Which means the values of N concentration deviate around 0.2394 from 1.749. Furthermore, the mean for SOC is 20.82 and the standard deviation is 4.138133.
+
+```{r}
+# plot the relationships 
+ggplot(total_N_SOC, 
+  aes(x = SOC, y = total_N)) +
+  geom_point(color = "darkgreen", size = 2) +
+  theme_bw()
+```
+
+We are expecting to reject our null hypothesis because it looks like there is a positive linear relationship between SOC in the soil and total nitrogen in the soil. Roughly speaking, total N varies from 0-2.5 and SOC varies from 15-35. As a result, the intercept varies around 8 of total nitrogen concentration. 
+
+Next we are going to make the model and check assumptions:
+
+```{r}
+# make a model 
+N_SOC_mod <- lm(SOC ~ total_N, data = total_N_SOC)
+```
+
+```{r}
+# check model assumptions
+autoplot(N_SOC_mod, smooth.colour = NA)
+```
+
+From the assumptions we can see that the observations relatively follow the line of normal distribution in the Q-Q plot. Which allows us to go ahead and run our regression. 
+
+Next we will conduct a regression model to see if there is a significant difference between SOC and total N concentration in the soil.
+
+```{r}
+# conduct test for regression model
+anova(N_SOC_mod)
+summary(N_SOC_mod)
+```
+
+Interpretation:
+
+A linear regression was conducted to see if there was an effect between soil organic carbon (SOC) and total Nitrogen (total_N) concentration in the soil. Soil organic carbon has a positive effect on total nitrogen in the soil. For each unit increase in soil organic carbon, total nitrogen increased by 16.048 units.  The adjusted R-square for the number of predictors in the model indicates approximately 85.8% of the variance in the data (p < 0.05, f = 212.6, df = 34, R^2 = 0.8621). 
+
+Next we will make a clean figure.
+
+```{r}
+# making a clean model
+ggplot(total_N_SOC, aes(x = SOC, y = total_N)) +
+  geom_point(color = "darkgreen", size = 2) + 
+  geom_smooth(method = 'lm') +
+  labs( 
+    title = "Relationship Between SOC and Total N in Soil",
+    x = "SOC",
+    y = "Total Nitrogen in Soil") +
+  theme_bw()
+```
+
+Results: 
+Soil organic carbon (SOC) has a positive effect on total nitrogen in the soil. For each unit increase in SOC, total nitrogen increased by 16.048. 
+
+
+
+
+

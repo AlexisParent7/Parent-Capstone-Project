@@ -6,7 +6,11 @@ format: html
 editor: visual
 ---
 
+<<<<<<< HEAD
 I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of POM. POM is an abbreviaiton for particulate organic matter.
+=======
+I am going to be running an multiple regression analysis on the relationship between rotation in number of years (2,3,4) and the concentration of POM.
+>>>>>>> a459134229a8eb4d55e9a29528ff27a390b88d4d
 
 ```{r}
 # set up R and clear R's brain

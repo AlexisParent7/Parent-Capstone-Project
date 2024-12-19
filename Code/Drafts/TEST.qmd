@@ -1,0 +1,114 @@
+---
+title: "TEST.qmd"
+format: html
+editor: visual
+---
+
+MANOVA test
+
+I am going to be running a MANOVA on the relationship between rotation in years (2,3,4) and the concentrations of POM and MAOM. POM is an abbreviation for particulate organic matter. MAOM is an abbreviation for mineral aggregate organic matter.The two dependent variables are POM and MAOM, while rotation is the independent variable.
+
+Null Hypothesis: Group means for POM and MAOM do not differ due to rotation in years (2,3,4).
+
+Alternative Hypothesis: There will be an effect on rotation and the concentrations of POM or MAOM.
+
+```{r}
+# set up R 
+rm(list=ls())
+library(tidyverse)
+library(multcomp)
+library(dplyr)
+library(ggfortify)
+library(here)
+```
+
+Next we are going to load in the data
+
+```{r}
+# read in cleaned data file 
+organic_matter <- read_csv(here("Data","organic_matter_clean.csv"))
+```
+
+Next, we are going to take a look at the data to see what we are looking at.
+
+```{r}
+glimpse(organic_matter)
+levels(organic_matter)
+view(organic_matter)
+```
+
+From using glimpse() and view() we can see there are negative values for both POM and MAOM. Upon looking further into the soil biology, having a negative POM and MAOM is not possible and could be an instrument error. As a result, I am going to change the negative values to 0. 0 is the lowest possible value for POM and MAOM, and because the negative values are so close to zero, it would make sense they have no POM or MAOM concentrations.
+
+```{r}
+# making negative values 0
+organic_matter_new <- organic_matter |>
+  mutate(POM = if_else(POM < 0, 0, POM)) |>
+  mutate(MAOM = if_else(MAOM < 0, 0 , MAOM))
+
+view(organic_matter_new)
+```
+
+Now that the negative values are now changed to 0, I am going to change rotation to a factor variable because it is currently a numerical variable. I am doing this because rotation is in three different categories (2,3,4 years).
+
+```{r}
+# changing rotation to a factor variable
+organic_matter_new$rotation <- factor(organic_matter_new$rotation)
+levels(organic_matter_new$rotation)
+```
+
+```{r}
+# summary stats for POM 
+organic_matter_new|> group_by(rotation) |>
+  summarise(
+  mean_POM = mean(POM, na.rm = T),
+  sd_POM = sd(POM, na.rm = T))
+
+# summary stats for MAOM 
+organic_matter_new|> group_by(rotation) |> 
+  summarise(
+  mean_MAOM = mean(MAOM, na.rm = T),
+  sd_MAOM = sd(MAOM, na.rm = T))
+```
+
+Next we are going to visualize the data
+
+```{r}
+# make a box and whisker plot
+ggplot(organic_matter_new, 
+       aes(x = rotation, y = POM, fill = rotation)) +
+       geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) + 
+  theme(legend.position = "side")
+ 
+ggplot(organic_matter_new, 
+       aes(x = rotation, y = MAOM, fill = rotation)) +
+       geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) + 
+  theme(legend.position = "side")
+```
+
+From the graphs we can see
+
+Next we are going to perform a one-way MANOVA
+
+```{r}
+# using cbind to combine dependent variables
+organic_matter_mod <- cbind(organic_matter_new$POM, organic_matter_new$MAOM)
+# next we are going to fit the model
+fit <- manova(organic_matter_mod ~ rotation, data = organic_matter_new)
+summary(fit)
+
+```
+
+test code
+
+```{r}
+manova_result <- manova(cbind(POM, MAOM) ~ rotation, data = organic_matter_new)
+
+summary(manova_result)
+
+summary(manova_result, test = "Pillai")
+summary(manova_result, test = "Wilks")
+summary(manova_result, test = "Hotelling-Lawley")
+summary(manova_result, test = "Roy")
+```

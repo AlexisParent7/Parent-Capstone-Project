@@ -1,0 +1,141 @@
+---
+title: "POM_MAOM.qmd"
+format: html
+editor: visual
+author: Alexis Parent 
+date: 12/7/2024
+---
+In this analysis, I will be looking at the relationship between rotation in years (2,3,4) and the concentrations of POM and MAOM, utilizing an ANCOVA model. The abbreviation POM stands for particulate organic matter and is a      variable. MAOM is an abbreviation for mineral aggregate organic matter, and is a          variable.  
+
+The number of years a crop is rotated has a large influence on how much organic matter resides in the soil. As crops are rotated, they instigate a diverse microbial community and better soil structure. Both of which aid in decomposing organic matter into stable forms (like POM and MAOM) while enhancing nutrient uptake by plants. 
+
+Null Hypothesis: There will be no difference between rotation (in years) and its effect on POM and MAOM concentrations.
+
+Alternative Hypothesis: There will be a difference between POM and MAOM concentration based on rotation (2,3,4 years).
+
+```{r}
+# set up R 
+rm(list=ls())
+library(tidyverse)
+library(multcomp)
+library(dplyr)
+library(ggfortify)
+library(here)
+```
+
+Next we are going to load in the data
+
+```{r}
+# read in cleaned data file 
+organic_matter <- read_csv(here("Data","organic_matter_clean.csv"))
+```
+
+Next, we are going to take a look at the data to see what we are looking at and look for errors.
+
+```{r}
+glimpse(organic_matter)
+levels(organic_matter)
+view(organic_matter)
+```
+
+From using glimpse() and view() we can see there are negative values for both POM and MAOM. Upon looking further into the soil biology, having a negative POM and MAOM is not possible and could be an instrument error. As a result, I am going to change the negative values to 0. 0 is the lowest possible value for POM and MAOM, and because the negative values are so close to zero, it would make sense they have no POM or MAOM concentrations.
+
+```{r}
+# making negative values 0
+organic_matter_new <- organic_matter |>
+  mutate(POM = if_else(POM < 0, 0, POM)) |>
+  mutate(MAOM = if_else(MAOM < 0, 0 , MAOM))
+
+view(organic_matter_new)
+```
+
+Now that the negative values are now changed to 0, I am going to change rotation to a factor variable because it is currently a numerical variable. I am doing this because rotation is in three different categories (2,3,4 years) rather than looking at years as a numerical variable.
+
+```{r}
+# changing rotation to a factor variable
+organic_matter_new$rotation <- factor(organic_matter_new$rotation)
+levels(organic_matter_new$rotation)
+```
+
+Next we are going to find the means of POM and MAOM, and also get summary statistics
+
+```{r}
+# summary stats for POM 
+organic_matter_new|> group_by(rotation) |>
+  summarise(
+  mean_POM = mean(POM, na.rm = T),
+  sd_POM = sd(POM, na.rm = T))
+
+# summary stats for MAOM 
+organic_matter_new|> group_by(rotation) |> 
+  summarise(
+  mean_MAOM = mean(MAOM, na.rm = T),
+  sd_MAOM = sd(MAOM, na.rm = T))
+
+sum_organic_matter
+```
+
+For a two year rotation the mean POM is 0.048, for three years it is 0.168, and for four years it is 0.1829. As a result we can see POM increases as rotation increases. For a two year rotation the mean MAOM concentration is 0.018, for three years it increases to 0.2569, and for a four year rotation it drop back down to 0.1887. As a result, MAOM concentration is not linear, as it begins at a low concentration, is the highest at three years, and then drops back down at four years.
+
+Next, we are going to make a histogram of MAOM to see how the data is distributed
+
+```{r}
+# histogram of MAOM 
+ggplot(organic_matter_new, aes(MAOM)) +
+  geom_histogram()
+```
+
+From the graph, we can see the data points are incredibly left skewed. We have zero inflation, which might make the assumptions not normally distributed.
+
+We are going to go ahead and make a scatter plot to see what the relationships look like between POM, MAOM and rotation.
+
+```{r}
+ggplot(organic_matter_new, aes(x = POM, y = MAOM, color = rotation)) +
+  geom_point()
+```
+
+From the graph we can see there is not much of a pattern. There seems to be more data points for rotation 4 than 2 or 3. 
+
+```{r}
+# build model 
+model_organic_matter <- lm(MAOM ~ POM + rotation, data = organic_matter_new)
+```
+
+Next we are going to check assumptions
+
+```{r}
+# check assumptions
+autoplot(model_organic_matter, smooth.colour = NA)
+```
+
+Response variable is not normally distributed. Now need a glm
+
+```{r}
+# using glm 
+model_organic_matter1 <- glm(MAOM ~ POM + rotation, data = organic_matter_new, family = quasipoisson)
+
+# running the analysis
+autoplot(model_organic_matter1)
+summary(model_organic_matter1)
+```
+
+Although we used glm() instead of lm() to make the model, we can still see on the Q-Q plot, the data is still not normally distributed. Furthermore, for all the rotations, p\>0.05, indicating none of the results are signifigant.
+
+Next we are going to make a final graph. However, we cannot add fitted lines becuase the data do not show a linear realtionship. We have not learned how to add fitted lines for a curve.
+
+Interpretation:
+
+We tested the hypothesis that the effect of rotation on
+
+CHANGE/MOVE: Next we are going to make a graph. We are going to add the points from sum_organic_matter and specify the x axis is rotation. We are going to connect the dots with lines. We are going to connect them based on concentrations of MAOM.
+
+```{r}
+# make a graph
+ggplot(organic_matter_new, aes(x = rotation, y = MAOM, 
+                               colour = POM, group = POM)) + 
+  geom_point() + 
+  geom_line() +
+  theme_bw()
+```
+
+The same colored points are not aligned similar to others. There is only one line that is parallel. As a result, leading me to believe there is no interaction between rotation and POM having an effect on MAOM.

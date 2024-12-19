@@ -1,0 +1,61 @@
+---
+title: "preliminary analysis feedback"
+format: html
+editor: visual
+---
+
+## Preliminary Analysis Feedback
+
+### Organic Matter MAOM
+First, please define abbreviations for variables neart the top of the script so it is easy to understand (define MAOM for example)
+
+Line 23 - file does not load. Check `here()` and make sure it points to the root folder of your project. If so, then you don't need "Parent-Capstone-Project" as part of the `here()` call.
+
+Line 35 - again, make sure you have define abbreviations MAOM and POM near top of file.
+
+How can  you have a negative value for MAOM? Or for POM? Since these are measures of organic matter, I don't understand how they can be less than zero.
+
+Line 62 - your question should address whether MAOM just appears to be decreasing after year 3 or of the difference b/w years 3 and 4 is not statistically different.
+
+Before you make your model, I would like to see a clear statement of your null and alternative hypotheses. Be very clear about your response and predictor variables.
+
+At the top of the script, you said you were going to be doing multiple regression. But line 68 - your model, is simply a 1-way ANOVA. However, your model is backwards. The strucure of a model should be response ~ predictor and  you have predictor ~ response. That is why your autoplot results look strange. You have made a categorical variable (rotation) into the dependent variable. It won't make a difference, mathematically, on your result, but you should know how to set this up by now and how to differentiate the response from the predictor variable.
+
+Line 76 - you are not "conducting a regression test" - you ran a 1-way ANOVA. And you ran it when you created the model. So at line 79, you are really just viewing model results.
+
+Line 91 - figure
+Take a look at chapter 5, figure 5.11 as an example of how you might plot the results of a 1-way anova. Your figure does not identify the MAOM units, nor does it appear to plot the means with some sort of error measurement (like standard error of the mean or standard deviation). Also, you should be plotting summarized data and not the raw data here  - it doesn't make sense that your y-axis steteches below zero.
+
+### POM and soil rotation scheme
+You have most of the same problems with this file as you did with the last one, so I'm not going to type them all out again. 
+
+But notice on line 39 that you have correctly identified the x and y variables - so make sure you know how to fit them into your model down below.
+
+Line 47 - is it just the range that increases? Do you think the mean value is changing?
+
+Line 53 - you set up the model correctly here! Good.
+
+Line 81 - when you have a p-value of 0.08, I call that "borderline signficance" - basically there are only 8 chances out of 100 that if you rejected your null hypotheses you would be making a mistake in doing so. But statisticians have arbitrarily determined that a p for signfiicance must be less thatn or equal to 0.05. Given that you have a pretty small sample size (N = 24 observations ) and that they are not evenly distributed between rotaton groups, you don't have a lot of "power" to find a difference. So I think you should discuss this in your intepretation and address the fact that, with more sampling, there might be an actual difference here. If there is, does it make biological sense?
+
+Again, your "clean figure" is not a very good choice for data visualization. I point you back to chapter 5 and the plot for a 1-way ANOVA again.
+
+### Total N SOC
+Again, please define your abbreviations for your variables. And please make a clear statement of your null and alternative hypotheses, with biological justification, at the top of the script.
+
+Line 56 - you should be trying to "guesstimate" the slope and y-intercept by looking at the plot like the book does in its example of linear regression in chapter 5 and like we did for homework and in problem set 3. I would like to see that inthe commentary before you create the model.
+
+Line 81 - you should also be including the adjusted R2 value and interpreting it as part of your interpretation step.
+
+Line 87 - the book also shows you how to make a good clean figure showing the smoothed fit as well as the points for your regression - please review chapter 5 and the regression homeworks. 
+
+Line 97 - 
+There is not anything else you need to include in the analysis, other than the R2 information I mentioned above. But in the results, you need to address the biology here - does it make biological sense that as soil N increases, so would SOC? 
+
+Also, I would like you to work on being more precise with your statistical language. In all 3 of your analyses, you have incorrectly identified the statistical methods you are employing or the stage at which you are conducting the test. I'm happy to discuss with you if that would be helpful, and I also point you to the keys on homeowork assignments, chapter 5, and the key to Problem Set 3 for more information. Finally, you need to spend more time thinking about how to make effective final plots.
+
+
+
+
+
+
+
